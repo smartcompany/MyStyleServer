@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
           ],
         },
       ],
-      max_completion_tokens: 4000,
+      max_completion_tokens: 3000,
     });
 
     console.log('OpenAI API 응답 받음');
@@ -102,7 +102,8 @@ export async function POST(request: NextRequest) {
     console.log('분석 결과 길이:', analysisResult?.length || 0);
     console.log('finish_reason:', response.choices[0]?.finish_reason);
     console.log('message 객체:', response.choices[0]?.message);
-    console.log('분석 결과:', response);
+    console.log('분석 결과 원본:', analysisResult);
+    console.log('전체 응답:', JSON.stringify(response, null, 2));
     
     if (!analysisResult) {
       console.log('분석 결과가 없음');
