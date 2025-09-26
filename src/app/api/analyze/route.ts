@@ -93,7 +93,9 @@ export async function POST(request: NextRequest) {
           ],
         },
       ],
-      max_completion_tokens: 3000,
+      response_format: {
+        type: "json_object"
+      }
     });
 
     console.log('OpenAI API 응답 받음');
