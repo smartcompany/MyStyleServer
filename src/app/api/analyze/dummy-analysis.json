@@ -1,46 +1,46 @@
 {
   "useDummy": true,
-  "overall_comment": "Based on your facial features and overall appearance, you have a naturally elegant and versatile style foundation. Your balanced facial proportions and warm skin tone create excellent opportunities for various styling approaches. With the right choices in hair, makeup, and fashion, you can enhance your natural beauty and express your unique personality effectively.",
+  "overall_comment": "당신의 얼굴 특징과 전반적인 외모를 바탕으로, 자연스럽고 우아하며 다재다능한 스타일 기반을 가지고 있습니다. 균형 잡힌 얼굴 비율과 따뜻한 피부톤이 다양한 스타일링 접근법을 위한 훌륭한 기회를 만들어냅니다. 올바른 헤어, 메이크업, 패션 선택을 통해 자연스러운 아름다움을 강화하고 독특한 개성을 효과적으로 표현할 수 있습니다.",
   "face_analysis": {
-    "face_shape": "Oval",
-    "balance_comment": "Your face has a well-balanced oval shape with harmonious proportions. The forehead and jawline are in perfect symmetry, creating an elegant and versatile foundation for various styling options.",
-    "strengths": "Perfect oval shape, balanced proportions, versatile styling potential",
-    "improvements": "Consider adding more definition to cheekbones for enhanced facial structure"
+    "face_shape": "계란형",
+    "balance_comment": "당신의 얼굴은 조화로운 비율을 가진 균형 잡힌 계란형입니다. 이마와 턱선이 완벽한 대칭을 이루며, 다양한 스타일링 옵션을 위한 우아하고 다재다능한 기반을 만들어냅니다.",
+    "strengths": "완벽한 계란형, 균형 잡힌 비율, 다재다능한 스타일링 잠재력",
+    "improvements": "강화된 얼굴 구조를 위해 볼뼈에 더 많은 정의를 추가하는 것을 고려하세요"
   },
   "skin_analysis": {
-    "skin_tone": "Warm",
-    "skin_type": "Combination",
-    "skin_comment": "You have a beautiful warm undertone with combination skin. Your skin shows good elasticity and a healthy glow, with slight oiliness in the T-zone that can be managed with proper skincare.",
-    "skin_issues": "Mild oiliness in T-zone, occasional dryness on cheeks",
-    "care_routine": "Use gentle cleanser twice daily, apply lightweight moisturizer, and use oil-free sunscreen",
-    "product_recommendations": "Look for products with hyaluronic acid and niacinamide for combination skin",
-    "recommended_colors": "Warm earth tones, golden yellows, rich oranges, and warm browns will complement your skin tone beautifully"
+    "skin_tone": "따뜻한 톤",
+    "skin_type": "복합성",
+    "skin_comment": "당신은 아름다운 따뜻한 언더톤과 복합성 피부를 가지고 있습니다. 피부는 좋은 탄력성과 건강한 윤기를 보여주며, 적절한 스킨케어로 관리할 수 있는 T존의 가벼운 유분이 있습니다.",
+    "skin_issues": "T존의 가벼운 유분, 뺨의 가끔 있는 건조함",
+    "care_routine": "하루 두 번 부드러운 클렌저 사용, 가벼운 모이스처라이저 도포, 오일프리 선크림 사용",
+    "product_recommendations": "복합성 피부를 위한 히알루론산과 나이아신아미드가 함유된 제품을 찾아보세요",
+    "recommended_colors": "따뜻한 어스톤, 골든 옐로우, 리치 오렌지, 따뜻한 브라운이 당신의 피부톤을 아름답게 보완할 것입니다"
   },
   "hair_analysis": {
-    "hair_comment": "Your hair texture and face shape work well together. Consider medium-length styles with soft layers to enhance your natural features. Avoid styles that add too much volume on the sides.",
-    "recommended_styles": "Lob cut with face-framing layers, soft waves, or a textured bob",
-    "styling_tips": "Use texturizing products to add movement, avoid overly straight styles that can make the face appear longer",
-    "maintenance_tips": "Regular trims every 6-8 weeks, use heat protectant when styling, consider a subtle balayage for dimension",
-    "beard_advice": "Keep facial hair well-groomed and consider a light stubble or clean-shaven look"
+    "hair_comment": "당신의 머리카락 질감과 얼굴형이 잘 어울립니다. 자연스러운 특징을 강조하기 위해 부드러운 레이어가 있는 중간 길이 스타일을 고려해보세요. 양쪽에 너무 많은 볼륨을 추가하는 스타일은 피하세요.",
+    "recommended_styles": "얼굴을 가두는 레이어가 있는 롭 컷, 부드러운 웨이브, 또는 텍스처가 있는 보브",
+    "styling_tips": "움직임을 추가하기 위해 텍스처 제품을 사용하고, 얼굴을 더 길게 보이게 할 수 있는 과도하게 직선적인 스타일은 피하세요",
+    "maintenance_tips": "6-8주마다 정기적으로 트리밍하고, 스타일링할 때 열 보호제를 사용하며, 차원감을 위한 미묘한 발레아주를 고려해보세요",
+    "beard_advice": "얼굴 털을 잘 정리하고 가벼운 수염이나 깔끔하게 면도한 모습을 고려해보세요"
   },
   "eyebrow_analysis": {
-    "eyebrow_shape": "Natural arch",
-    "eyebrow_comment": "Your eyebrows have a good natural arch and thickness. They frame your eyes well but could benefit from slight shaping to create more definition and lift.",
-    "styling_tips": "Maintain the natural arch, slightly extend the tail for a more lifted appearance",
-    "maintenance_tips": "Tweeze stray hairs below the arch, use a clear brow gel to set hairs in place, consider professional shaping every 4-6 weeks",
-    "styling_recommendations": "Consider professional shaping to enhance the natural arch and create better definition"
+    "eyebrow_shape": "자연스러운 아치",
+    "eyebrow_comment": "당신의 눈썹은 좋은 자연스러운 아치와 두께를 가지고 있습니다. 눈을 잘 가두고 있지만 더 명확한 정의와 리프트를 만들기 위해 약간의 셰이핑이 도움이 될 것입니다.",
+    "styling_tips": "자연스러운 아치를 유지하고, 더 리프트된 외관을 위해 테일을 약간 연장하세요",
+    "maintenance_tips": "아치 아래의 잡털을 뽑고, 털을 제자리에 고정하기 위해 투명한 브로우 젤을 사용하며, 4-6주마다 전문 셰이핑을 고려해보세요",
+    "styling_recommendations": "자연스러운 아치를 강화하고 더 나은 정의를 만들기 위해 전문 셰이핑을 고려해보세요"
   },
   "fashion_analysis": {
-    "fashion_comment": "Your warm skin tone and oval face shape give you great versatility in fashion choices. Focus on pieces that enhance your natural elegance and create vertical lines.",
-    "styling_recommendations": "V-neck tops, structured blazers, high-waisted bottoms, and accessories that add vertical interest",
-    "recommended_colors": "Warm neutrals, deep burgundy, forest green, and rich navy work beautifully with your coloring",
-    "glasses_recommendations": "Oval or rectangular frames with subtle detailing, avoid overly round or square frames",
-    "accessory_recommendations": "Delicate necklaces, statement earrings, and structured handbags that complement your refined style"
+    "fashion_comment": "당신의 따뜻한 피부톤과 계란형 얼굴이 패션 선택에서 큰 다양성을 제공합니다. 자연스러운 우아함을 강화하고 수직선을 만드는 아이템에 집중하세요.",
+    "styling_recommendations": "V넥 탑, 구조화된 블레이저, 하이웨이스트 바텀, 수직적 흥미를 더하는 액세서리",
+    "recommended_colors": "따뜻한 뉴트럴, 딥 버건디, 포레스트 그린, 리치 네이비가 당신의 색조와 아름답게 어울립니다",
+    "glasses_recommendations": "미묘한 디테일이 있는 계란형 또는 직사각형 프레임, 과도하게 둥글거나 사각형인 프레임은 피하세요",
+    "accessory_recommendations": "당신의 세련된 스타일을 보완하는 섬세한 목걸이, 스테이트먼트 이어링, 구조화된 핸드백"
   },
   "lifestyle_advice": {
-    "general_advice": "Your overall appearance suggests a balanced lifestyle. Focus on maintaining good sleep habits and staying hydrated to keep your skin glowing and reduce any puffiness around the eyes.",
-    "sleep_advice": "Aim for 7-8 hours of quality sleep, use a silk pillowcase to prevent hair breakage",
-    "diet_advice": "Stay hydrated with 8 glasses of water daily, include antioxidant-rich foods like berries and leafy greens",
-    "exercise_advice": "Regular cardio and facial exercises can help maintain skin elasticity and reduce stress-related breakouts"
+    "general_advice": "당신의 전반적인 외모는 균형 잡힌 라이프스타일을 시사합니다. 피부를 빛나게 하고 눈 주변의 부종을 줄이기 위해 좋은 수면 습관을 유지하고 수분을 충분히 섭취하는 데 집중하세요.",
+    "sleep_advice": "하루 7-8시간의 질 좋은 수면을 목표로 하고, 머리카락 손상을 방지하기 위해 실크 베개커버를 사용하세요",
+    "diet_advice": "하루 8잔의 물로 수분을 충분히 섭취하고, 베리류와 잎채소 같은 항산화 물질이 풍부한 음식을 포함하세요",
+    "exercise_advice": "정기적인 유산소 운동과 얼굴 운동은 피부 탄력을 유지하고 스트레스 관련 여드름을 줄이는 데 도움이 됩니다"
   }
 }

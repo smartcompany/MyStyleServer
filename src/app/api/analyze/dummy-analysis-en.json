@@ -1,0 +1,46 @@
+{
+  "useDummy": true,
+  "overall_comment": "Based on your facial features and overall appearance, you have a naturally elegant and versatile style foundation. Your balanced facial proportions and warm skin tone create excellent opportunities for various styling approaches. With the right choices in hair, makeup, and fashion, you can enhance your natural beauty and express your unique personality effectively.",
+  "face_analysis": {
+    "face_shape": "Oval",
+    "balance_comment": "Your face has a well-balanced oval shape with harmonious proportions. The forehead and jawline are in perfect symmetry, creating an elegant and versatile foundation for various styling options.",
+    "strengths": "Perfect oval shape, balanced proportions, versatile styling potential",
+    "improvements": "Consider adding more definition to cheekbones for enhanced facial structure"
+  },
+  "skin_analysis": {
+    "skin_tone": "Warm",
+    "skin_type": "Combination",
+    "skin_comment": "You have a beautiful warm undertone with combination skin. Your skin shows good elasticity and a healthy glow, with slight oiliness in the T-zone that can be managed with proper skincare.",
+    "skin_issues": "Mild oiliness in T-zone, occasional dryness on cheeks",
+    "care_routine": "Use gentle cleanser twice daily, apply lightweight moisturizer, and use oil-free sunscreen",
+    "product_recommendations": "Look for products with hyaluronic acid and niacinamide for combination skin",
+    "recommended_colors": "Warm earth tones, golden yellows, rich oranges, and warm browns will complement your skin tone beautifully"
+  },
+  "hair_analysis": {
+    "hair_comment": "Your hair texture and face shape work well together. Consider medium-length styles with soft layers to enhance your natural features. Avoid styles that add too much volume on the sides.",
+    "recommended_styles": "Lob cut with face-framing layers, soft waves, or a textured bob",
+    "styling_tips": "Use texturizing products to add movement, avoid overly straight styles that can make the face appear longer",
+    "maintenance_tips": "Regular trims every 6-8 weeks, use heat protectant when styling, consider a subtle balayage for dimension",
+    "beard_advice": "Keep facial hair well-groomed and consider a light stubble or clean-shaven look"
+  },
+  "eyebrow_analysis": {
+    "eyebrow_shape": "Natural arch",
+    "eyebrow_comment": "Your eyebrows have a good natural arch and thickness. They frame your eyes well but could benefit from slight shaping to create more definition and lift.",
+    "styling_tips": "Maintain the natural arch, slightly extend the tail for a more lifted appearance",
+    "maintenance_tips": "Tweeze stray hairs below the arch, use a clear brow gel to set hairs in place, consider professional shaping every 4-6 weeks",
+    "styling_recommendations": "Consider professional shaping to enhance the natural arch and create better definition"
+  },
+  "fashion_analysis": {
+    "fashion_comment": "Your warm skin tone and oval face shape give you great versatility in fashion choices. Focus on pieces that enhance your natural elegance and create vertical lines.",
+    "styling_recommendations": "V-neck tops, structured blazers, high-waisted bottoms, and accessories that add vertical interest",
+    "recommended_colors": "Warm neutrals, deep burgundy, forest green, and rich navy work beautifully with your coloring",
+    "glasses_recommendations": "Oval or rectangular frames with subtle detailing, avoid overly round or square frames",
+    "accessory_recommendations": "Delicate necklaces, statement earrings, and structured handbags that complement your refined style"
+  },
+  "lifestyle_advice": {
+    "general_advice": "Your overall appearance suggests a balanced lifestyle. Focus on maintaining good sleep habits and staying hydrated to keep your skin glowing and reduce any puffiness around the eyes.",
+    "sleep_advice": "Aim for 7-8 hours of quality sleep, use a silk pillowcase to prevent hair breakage",
+    "diet_advice": "Stay hydrated with 8 glasses of water daily, include antioxidant-rich foods like berries and leafy greens",
+    "exercise_advice": "Regular cardio and facial exercises can help maintain skin elasticity and reduce stress-related breakouts"
+  }
+}

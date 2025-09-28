@@ -3,6 +3,7 @@ import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
 import faceAnalysisPrompt from './face_analysis_prompt.txt';
 import dummyAnalysis from './dummy-analysis.json';
+import { getLanguageFromHeaders, getLanguageSpecificPrompt, openAIConfig } from '../_helpers';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -17,13 +18,39 @@ export async function POST(request: NextRequest) {
   try {
     console.log('분석 API 호출 시작');
     
+    // 언어 정보 추출
+    const language = getLanguageFromHeaders(request);
+    console.log('요청 언어:', language);
+    
     // Check if dummy mode is enabled from dummy-analysis.json
     const useDummy = dummyAnalysis.useDummy === true;
     
     if (useDummy) {
       console.log('더미 분석 결과 반환');
+      
+      // 언어별 더미 데이터 로드
+      let dummyData;
+      try {
+        switch (language) {
+          case 'en':
+            dummyData = await import('./dummy-analysis-en.json');
+            break;
+          case 'ja':
+            dummyData = await import('./dummy-analysis-ja.json');
+            break;
+          case 'zh':
+            dummyData = await import('./dummy-analysis-zh.json');
+            break;
+          default:
+            dummyData = dummyAnalysis; // 한국어 기본값
+        }
+      } catch (error) {
+        console.error('언어별 더미 데이터 로드 실패:', error);
+        dummyData = dummyAnalysis; // 기본값으로 폴백
+      }
+      
       // useDummy 필드를 제거하고 클라이언트에 전달
-      const { useDummy: _, ...analysisResult } = dummyAnalysis;
+      const { useDummy: _, ...analysisResult } = dummyData;
       console.log('서버에서 보내는 분석 결과:', JSON.stringify(analysisResult, null, 2));
       return NextResponse.json(analysisResult);
     }
@@ -79,15 +106,15 @@ export async function POST(request: NextRequest) {
     const imageUrl = signedUrlData.signedUrl;
     console.log('서명된 이미지 URL 생성:', imageUrl);
 
-    // 프롬프트 사용
-    const prompt = faceAnalysisPrompt;
-    console.log('프롬프트 사용:', prompt);
+    // 언어별 프롬프트 생성
+    const prompt = getLanguageSpecificPrompt(faceAnalysisPrompt, language);
+    console.log('언어별 프롬프트 사용:', language);
 
     // OpenAI Vision API 호출
     console.log('OpenAI API 호출 시작');
     
     const response = await openai.chat.completions.create({
-      model: 'gpt-5-mini',
+      ...openAIConfig,
       messages: [
         {
           role: 'user',
