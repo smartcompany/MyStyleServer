@@ -22,7 +22,9 @@ export async function POST(request: NextRequest) {
     
     if (useDummy) {
       console.log('더미 분석 결과 반환');
-      return NextResponse.json(dummyAnalysis);
+      // useDummy 필드를 제거하고 클라이언트에 전달
+      const { useDummy: _, ...analysisResult } = dummyAnalysis;
+      return NextResponse.json(analysisResult);
     }
     
     const formData = await request.formData();
