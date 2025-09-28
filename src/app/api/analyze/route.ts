@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
       console.log('더미 분석 결과 반환');
       // useDummy 필드를 제거하고 클라이언트에 전달
       const { useDummy: _, ...analysisResult } = dummyAnalysis;
+      console.log('서버에서 보내는 분석 결과:', JSON.stringify(analysisResult, null, 2));
       return NextResponse.json(analysisResult);
     }
     
