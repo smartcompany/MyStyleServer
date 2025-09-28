@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
 import faceAnalysisPrompt from './face_analysis_prompt.txt';
+import dummyAnalysis from './dummy-analysis.json';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -15,6 +16,14 @@ const supabase = createClient(
 export async function POST(request: NextRequest) {
   try {
     console.log('분석 API 호출 시작');
+    
+    // Check if dummy mode is enabled from dummy-analysis.json
+    const useDummy = dummyAnalysis.useDummy === true;
+    
+    if (useDummy) {
+      console.log('더미 분석 결과 반환');
+      return NextResponse.json(dummyAnalysis);
+    }
     
     const formData = await request.formData();
     const imageFile = formData.get('image') as File;
