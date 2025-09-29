@@ -14,6 +14,8 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_KEY!
 );
 
+const useDummy = true;
+
 export async function POST(request: NextRequest) {
   try {
     console.log('분석 API 호출 시작');
@@ -21,9 +23,6 @@ export async function POST(request: NextRequest) {
     // 언어 정보 추출
     const language = getLanguageFromHeaders(request);
     console.log('요청 언어:', language);
-    
-    // Check if dummy mode is enabled from dummy-analysis.json
-    const useDummy = dummyAnalysis.useDummy === true;
     
     if (useDummy) {
       console.log('더미 분석 결과 반환');
@@ -49,10 +48,8 @@ export async function POST(request: NextRequest) {
         dummyData = dummyAnalysis; // 기본값으로 폴백
       }
       
-      // useDummy 필드를 제거하고 클라이언트에 전달
-      const { useDummy: _, ...analysisResult } = dummyData;
-      console.log('서버에서 보내는 분석 결과:', JSON.stringify(analysisResult, null, 2));
-      return NextResponse.json(analysisResult);
+      console.log('서버에서 보내는 분석 결과:', JSON.stringify(dummyData, null, 2));
+      return NextResponse.json(dummyData);
     }
     
     const formData = await request.formData();
