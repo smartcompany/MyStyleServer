@@ -14,7 +14,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_KEY!
 );
 
-const useDummy = true;
+const useDummy = false;
 
 export async function POST(request: NextRequest) {
   try {
