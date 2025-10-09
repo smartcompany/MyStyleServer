@@ -114,6 +114,10 @@ export async function POST(request: NextRequest) {
       ...openAIConfig,
       messages: [
         {
+          role: 'system',
+          content: '너는 전문적인 얼굴 분석가입니다. 사용자의 얼굴 사진을 분석하여 객관적이고 건설적인 스타일 조언을 제공합니다.',
+        },
+        {
           role: 'user',
           content: [
             {
