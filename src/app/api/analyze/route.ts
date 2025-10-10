@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
 import faceAnalysisPrompt from './face_analysis_prompt.txt';
+import fullBodyAnalysisPrompt from './fullbody_analysis_prompt.txt';
 import dummyAnalysis from './dummy-analysis.json';
 import { getLanguageFromHeaders, getLanguageSpecificPrompt, openAIConfig } from '../_helpers';
 
@@ -14,46 +15,19 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_KEY!
 );
 
-const useDummy = false;
-
 export async function POST(request: NextRequest) {
   try {
-    console.log('분석 API 호출 시작');
+    console.log('통합 분석 API 호출 시작');
     
     // 언어 정보 추출
     const language = getLanguageFromHeaders(request);
     console.log('요청 언어:', language);
     
-    if (useDummy) {
-      console.log('더미 분석 결과 반환');
-      
-      // 언어별 더미 데이터 로드
-      let dummyData;
-      try {
-        switch (language) {
-          case 'en':
-            dummyData = await import('./dummy-analysis-en.json');
-            break;
-          case 'ja':
-            dummyData = await import('./dummy-analysis-ja.json');
-            break;
-          case 'zh':
-            dummyData = await import('./dummy-analysis-zh.json');
-            break;
-          default:
-            dummyData = dummyAnalysis; // 한국어 기본값
-        }
-      } catch (error) {
-        console.error('언어별 더미 데이터 로드 실패:', error);
-        dummyData = dummyAnalysis; // 기본값으로 폴백
-      }
-      
-      console.log('서버에서 보내는 분석 결과:', JSON.stringify(dummyData, null, 2));
-      return NextResponse.json(dummyData);
-    }
-    
     const formData = await request.formData();
     const imageFile = formData.get('image') as File;
+    const analysisType = formData.get('type') as string || 'face'; // 기본값은 얼굴 분석
+    
+    console.log('분석 타입:', analysisType);
     
     if (!imageFile) {
       console.log('이미지 파일이 없음');
@@ -67,7 +41,7 @@ export async function POST(request: NextRequest) {
 
     // Supabase에 이미지 업로드
     const imageBuffer = await imageFile.arrayBuffer();
-    const fileName = `user-photos/analysis_${Date.now()}_${imageFile.name}`;
+    const fileName = `user-photos/${analysisType}_analysis_${Date.now()}_${imageFile.name}`;
     
     console.log('Supabase에 이미지 업로드 시작:', fileName);
     
@@ -103,19 +77,31 @@ export async function POST(request: NextRequest) {
     const imageUrl = signedUrlData.signedUrl;
     console.log('서명된 이미지 URL 생성:', imageUrl);
 
-    // 언어별 프롬프트 생성
-    const prompt = getLanguageSpecificPrompt(faceAnalysisPrompt, language);
-    console.log('언어별 프롬프트 사용:', language);
+    // 분석 타입에 따라 다른 프롬프트 사용
+    let prompt;
+    let systemMessage;
+    
+    if (analysisType === 'fullbody') {
+      // 전신 분석
+      prompt = getLanguageSpecificPrompt(fullBodyAnalysisPrompt, language);
+      systemMessage = '너는 전문적인 스타일리스트입니다. 사용자의 전신 사진을 분석하여 체형과 현재 스타일을 고려한 맞춤형 패션 조언을 제공합니다.';
+    } else {
+      // 얼굴 분석 (기본값)
+      prompt = getLanguageSpecificPrompt(faceAnalysisPrompt, language);
+      systemMessage = '너는 전문적인 얼굴 분석가입니다. 사용자의 얼굴 사진을 분석하여 얼굴형, 피부톤, 헤어스타일 등을 종합적으로 평가하고 개인화된 스타일 조언을 제공합니다.';
+    }
+
+    console.log('언어별 프롬프트 사용:', language, '분석 타입:', analysisType);
 
     // OpenAI Vision API 호출
-    console.log('OpenAI API 호출 시작');
+    console.log('OpenAI API 호출 시작 (분석 타입:', analysisType, ')');
     
     const response = await openai.chat.completions.create({
       ...openAIConfig,
       messages: [
         {
           role: 'system',
-          content: '너는 전문적인 얼굴 분석가입니다. 사용자의 얼굴 사진을 분석하여 객관적이고 건설적인 스타일 조언을 제공합니다.',
+          content: systemMessage,
         },
         {
           role: 'user',
@@ -138,14 +124,12 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    console.log('OpenAI API 응답 받음');
+    console.log('OpenAI API 응답 받음 (분석 타입:', analysisType, ')');
 
     const analysisResult = response.choices[0]?.message?.content;
     console.log('분석 결과 길이:', analysisResult?.length || 0);
     console.log('finish_reason:', response.choices[0]?.finish_reason);
-    console.log('message 객체:', response.choices[0]?.message);
     console.log('분석 결과 원본:', analysisResult);
-    console.log('전체 응답:', JSON.stringify(response, null, 2));
     
     if (!analysisResult) {
       console.log('분석 결과가 없음');
@@ -157,9 +141,9 @@ export async function POST(request: NextRequest) {
 
     // JSON 파싱 시도
     try {
-      console.log('JSON 파싱 시작');
+      console.log('분석 JSON 파싱 시작');
       const parsedResult = JSON.parse(analysisResult);
-      console.log('JSON 파싱 성공, 결과 키들:', Object.keys(parsedResult));
+      console.log('분석 JSON 파싱 성공, 결과 키들:', Object.keys(parsedResult));
       
       // 분석 완료 후 이미지 삭제 (보안)
       try {
@@ -173,20 +157,20 @@ export async function POST(request: NextRequest) {
       }
       
       return NextResponse.json(parsedResult);
-    } catch (parseError) {
-      console.error('JSON 파싱 오류:', parseError);
-      console.log('원본 분석 결과:', analysisResult.substring(0, 500) + '...');
+      } catch (parseError) {
+        console.error('분석 JSON 파싱 오류:', parseError);
+        console.log('원본 분석 결과:', analysisResult.substring(0, 500) + '...');
+        return NextResponse.json(
+          { error: '분석 결과 파싱에 실패했습니다.' },
+          { status: 500 }
+        );
+      }
+
+    } catch (error) {
+      console.error('통합 분석 API 오류:', error);
       return NextResponse.json(
-        { error: '분석 결과 파싱에 실패했습니다.' },
+        { error: '분석 중 오류가 발생했습니다.' },
         { status: 500 }
       );
     }
-
-  } catch (error) {
-    console.error('분석 API 오류:', error);
-    return NextResponse.json(
-      { error: '분석 중 오류가 발생했습니다.' },
-      { status: 500 }
-    );
-  }
 }
