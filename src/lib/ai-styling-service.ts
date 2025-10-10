@@ -1,6 +1,23 @@
 import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
 
+// 타입 정의
+interface WeatherData {
+  temp_c: number;
+  feels_like_c: number;
+  condition: string;
+  precipitation_mm: number;
+  wind_mps: number;
+  humidity_pct: number;
+}
+
+interface StylingResponse {
+  imageUrl: string;
+  style: string;
+  outfitSummary: string;
+  careTips: string[];
+}
+
 const storageBucket = process.env.STORAGE_BUCKET; 
 const PROMPTS_FOLDER = 'prompts';
 const USER_PHOTOS_FOLDER = 'user-photos';
@@ -75,7 +92,7 @@ export class AIStylingService {
     }
   }
 
-  async generateStyleRecommendation(request: StylingRequest): Promise<any> {
+  async generateStyleRecommendation(request: StylingRequest): Promise<StylingResponse> {
     try {
       // 1. 원본 이미지 다운로드
       console.log('이미지 다운로드 시작:', request.imageUrl);
@@ -106,10 +123,10 @@ export class AIStylingService {
        }
 
        return {
-         image_url: url,
+         imageUrl: url,
          style: request.stylePreset,
-         outfit_summary: `Weather-appropriate ${request.stylePreset} outfit for ${request.location}`,
-         care_tips: [
+         outfitSummary: `Weather-appropriate ${request.stylePreset} outfit`,
+         careTips: [
            "Follow care instructions on clothing labels",
            "Store items properly to maintain shape"
          ]
@@ -141,7 +158,7 @@ export class AIStylingService {
       .replace('{WEATHER_HUMIDITY_PCT}', weatherData.humidity_pct.toString())
   }
 
-  private parseWeatherSummary(weatherSummary: string): any {
+  private parseWeatherSummary(weatherSummary: string): WeatherData {
     // 기본값 설정
     const defaultWeather = {
       temp_c: 22,
@@ -157,7 +174,14 @@ export class AIStylingService {
     try {
       // "temperature : 22 C, feelsLike : 24 C, humidity : 65%, windSpeed : 3.5 m/s, main : Clear, desc : 맑음, location : 서울"
       const parts = weatherSummary.split(',');
-      const weather: any = {};
+      const weather: WeatherData = {
+        temp_c: 22,
+        feels_like_c: 24,
+        condition: 'Clear',
+        precipitation_mm: 0,
+        wind_mps: 3.5,
+        humidity_pct: 65
+      };
 
       parts.forEach(part => {
         const [key, value] = part.split(':').map(s => s.trim());
