@@ -6,34 +6,57 @@ export class WeatherService {
   private baseUrl = 'https://api.weatherapi.com/v1';
 
   constructor() {
+    console.log('🔧 WeatherService 생성자 시작');
+    console.log('환경변수 WEATHERAPI_KEY 존재 여부:', !!process.env.WEATHERAPI_KEY);
+    console.log('환경변수 값 길이:', process.env.WEATHERAPI_KEY?.length || 0);
+    
     this.apiKey = process.env.WEATHERAPI_KEY || '';
     if (!this.apiKey) {
-      console.log('WeatherAPI key not found - weather requests will fail');
+      console.log('❌ WeatherAPI key not found - weather requests will fail');
+    } else {
+      console.log('✅ WeatherAPI key found, length:', this.apiKey.length);
     }
+    console.log('🔧 WeatherService 생성자 완료');
   }
 
   async getCurrentWeather(latitude: number, longitude: number, language: string = 'en'): Promise<Weather> {
+    console.log('🌤️ getCurrentWeather 시작');
+    console.log('파라미터 - latitude:', latitude, 'longitude:', longitude, 'language:', language);
+    
     // API 키가 없으면 에러 반환
     if (!this.apiKey) {
+      console.log('❌ API 키 없음 - getCurrentWeather 실패');
       throw new Error('WeatherAPI key not found');
     }
 
-    try {
-      const response = await axios.get(
-        `${this.baseUrl}/current.json`,
-        {
-          params: {
-            key: this.apiKey,
-            q: `${latitude},${longitude}`,
-            aqi: 'yes', // 대기질 정보 포함
-            lang: language,
-          },
-        }
-      );
+    const url = `${this.baseUrl}/current.json`;
+    const params = {
+      key: this.apiKey,
+      q: `${latitude},${longitude}`,
+      aqi: 'yes', // 대기질 정보 포함
+      lang: language,
+    };
+    
+    console.log('🌐 WeatherAPI 요청 URL:', url);
+    console.log('🌐 요청 파라미터:', { ...params, key: '***' }); // API 키는 마스킹
 
-      return this.transformWeatherApiResponse(response.data, language);
+    try {
+      const response = await axios.get(url, { params });
+      console.log('✅ WeatherAPI 응답 받음 - 상태코드:', response.status);
+      console.log('✅ 응답 데이터 구조:', Object.keys(response.data));
+
+      const result = this.transformWeatherApiResponse(response.data, language);
+      console.log('✅ 날씨 데이터 변환 완료');
+      return result;
     } catch (error) {
-      console.error('Error fetching current weather:', error);
+      console.error('❌ WeatherAPI 요청 실패:');
+      if (axios.isAxiosError(error)) {
+        console.error('응답 상태:', error.response?.status);
+        console.error('응답 데이터:', error.response?.data);
+        console.error('요청 URL:', error.config?.url);
+        console.error('요청 파라미터:', error.config?.params);
+      }
+      console.error('전체 에러:', error);
       throw new Error(`Failed to fetch weather data: ${error}`);
     }
   }
