@@ -47,6 +47,7 @@ export interface WeatherApiResponse {
     feelslike_c: number;
     humidity: number;
     wind_kph: number;
+    cloud: number; // 구름 양 (%)
     condition: {
       text: string;
       icon: string;

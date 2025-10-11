@@ -4,15 +4,15 @@ import { Weather, WeatherForecast } from '@/types/weather';
 
 // 캐시 저장소
 const weatherCache = new Map<string, { data: WeatherResponse; timestamp: number }>();
-const CACHE_DURATION = 10 * 60 * 1000; // 10분
+const CACHE_DURATION = 2 * 60 * 1000; // 2분으로 단축
 
 interface WeatherResponse {
   current: Weather;
   forecast: WeatherForecast;
 }
 
-function getCacheKey(lat: number, lon: number): string {
-  return `${lat.toFixed(2)},${lon.toFixed(2)}`;
+function getCacheKey(lat: number, lon: number, language: string): string {
+  return `${lat.toFixed(2)},${lon.toFixed(2)},${language}`;
 }
 
 function getCachedWeather(key: string) {
@@ -36,6 +36,9 @@ export async function GET(request: NextRequest) {
     const lat = searchParams.get('lat');
     const lon = searchParams.get('lon');
     const city = searchParams.get('city');
+    
+    // 언어 정보 추출 (클라이언트에서 전달)
+    const language = request.headers.get('X-Language') || 'en';
 
     if (!lat || !lon) {
       return NextResponse.json(
@@ -46,7 +49,7 @@ export async function GET(request: NextRequest) {
 
     const latitude = parseFloat(lat);
     const longitude = parseFloat(lon);
-    const cacheKey = getCacheKey(latitude, longitude);
+    const cacheKey = getCacheKey(latitude, longitude, language);
 
     // 캐시된 데이터 확인
     const cachedWeather = getCachedWeather(cacheKey);
@@ -60,8 +63,8 @@ export async function GET(request: NextRequest) {
     
     // 현재 날씨와 예보를 함께 가져오기
     const [weather, forecast] = await Promise.all([
-      weatherService.getCurrentWeather(latitude, longitude),
-      weatherService.getWeatherForecast(latitude, longitude)
+      weatherService.getCurrentWeather(latitude, longitude, language),
+      weatherService.getWeatherForecast(latitude, longitude, language)
     ]);
 
     const result = {
