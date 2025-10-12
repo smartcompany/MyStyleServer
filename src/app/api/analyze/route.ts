@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import faceAnalysisPrompt from './face_analysis_prompt.txt';
 import fullBodyAnalysisPrompt from './fullbody_analysis_prompt.txt';
 import dummyAnalysis from './dummy-analysis.json';
+import dummyAnalysisBody from './dummy-analysis-body.json';
 import { getLanguageFromHeaders, getLanguageSpecificPrompt, openAIConfig } from '../_helpers';
 
 const openai = new OpenAI({
@@ -26,8 +27,18 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const imageFile = formData.get('image') as File;
     const analysisType = formData.get('type') as string || 'face'; // 기본값은 얼굴 분석
+    const useDummy = formData.get('useDummy') as string || 'false';
     
     console.log('분석 타입:', analysisType);
+
+    if (useDummy === 'true') {
+      console.log('더미 분석 사용');
+      if (analysisType === 'fullbody') {
+        return NextResponse.json(dummyAnalysisBody);
+      } else {
+        return NextResponse.json(dummyAnalysis);
+      }
+    }
     
     if (!imageFile) {
       console.log('이미지 파일이 없음');
