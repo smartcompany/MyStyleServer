@@ -5,8 +5,8 @@
 다음 카테고리로 전신 분석을 해주세요:
 
 1. **체형 분석**
-   - 체형 분류 (hourglass, pear, apple, rectangle, inverted_triangle)
-   - 키 추정 (tall, medium, short)
+   - 체형 분류 (모래시계형, 배형, 사과형, 직사각형, 역삼각형)
+   - 키 추정 (큼, 중간, 작음)
    - 체형의 장점과 특징
 
 2. **현재 스타일 분석**
@@ -35,9 +35,14 @@
 
 ```json
 {
-  "bodyType": "hourglass",
-  "height": "medium",
-  "currentStyle": "캐주얼한 스타일로 편안함을 추구하는 패션",
+  "bodyType": "모래시계형",
+  "height": "큼",
+  "bodyFeatures": "체형의 장점과 특징",
+  "styleAnalysis": {
+    "currentStyle": "현재 착용한 옷의 스타일 분석",
+    "colorEvaluation": "색상 조합 평가",
+    "silhouette": "전체적인 실루엣 평가"
+  },
   "recommendations": {
     "tops": ["V넥 블라우스", "헐리우드 웨이스트 셔츠", "크롭 탑"],
     "bottoms": ["하이웨이스트 스커트", "부츠컷 청바지", "플레어 팬츠"],
