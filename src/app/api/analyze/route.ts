@@ -28,8 +28,20 @@ export async function POST(request: NextRequest) {
     const imageFile = formData.get('image') as File;
     const analysisType = formData.get('type') as string || 'face'; // 기본값은 얼굴 분석
     const useDummy = formData.get('useDummy') as string || 'false';
+    const weatherData = formData.get('weather') as string;
     
     console.log('분석 타입:', analysisType);
+    
+    // 날씨 정보 파싱
+    let weather = null;
+    if (weatherData) {
+      try {
+        weather = JSON.parse(weatherData);
+        console.log('날씨 정보:', weather);
+      } catch (e) {
+        console.log('날씨 정보 파싱 실패:', e);
+      }
+    }
 
     if (useDummy === 'true') {
       console.log('더미 분석 사용');
@@ -95,6 +107,20 @@ export async function POST(request: NextRequest) {
     if (analysisType === 'fullbody') {
       // 전신 분석
       prompt = getLanguageSpecificPrompt(fullBodyAnalysisPrompt, language);
+      
+      // 날씨 정보가 있으면 템플릿 변수를 실제 값으로 치환
+      if (weather) {
+        prompt = prompt
+          .replace('{{TEMPERATURE}}', weather.temperature?.toString() || 'N/A')
+          .replace('{{WEATHER_MAIN}}', weather.main || 'N/A')
+          .replace('{{WEATHER_DESCRIPTION}}', weather.description || 'N/A')
+          .replace('{{HUMIDITY}}', weather.humidity?.toString() || 'N/A')
+          .replace('{{WIND_SPEED}}', weather.windSpeed?.toString() || 'N/A');
+      } else {
+        // 날씨 정보가 없으면 해당 섹션 제거
+        prompt = prompt.replace(/## 현재 날씨 정보[\s\S]*?위 날씨 정보를 고려하여 실용적이고 계절에 맞는 스타일링 추천을 제공해주세요\./g, '');
+      }
+      
       systemMessage = '너는 전문적인 스타일리스트입니다. 사용자의 전신 사진을 분석하여 체형과 현재 스타일을 고려한 맞춤형 패션 조언을 제공합니다.';
     } else {
       // 얼굴 분석 (기본값)
