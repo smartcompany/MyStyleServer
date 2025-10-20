@@ -28,7 +28,7 @@ interface AnalysisResult {
   language: string;
 }
 
-export default function SharePage() {
+function SharePageContent() {
   const searchParams = useSearchParams();
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -266,5 +266,20 @@ export default function SharePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SharePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">로딩 중...</p>
+        </div>
+      </div>
+    }>
+      <SharePageContent />
+    </Suspense>
   );
 }
