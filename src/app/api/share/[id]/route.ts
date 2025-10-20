@@ -71,12 +71,13 @@ export async function POST(request: NextRequest) {
 // 결과 조회 API
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await ensureDataDir();
     
-    const filePath = path.join(DATA_DIR, `${params.id}.json`);
+    const { id } = await params;
+    const filePath = path.join(DATA_DIR, `${id}.json`);
     
     if (!existsSync(filePath)) {
       return NextResponse.json(
