@@ -1,7 +1,10 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
+
+// 동적 렌더링 강제 (prerendering 비활성화)
+export const dynamic = 'force-dynamic';
 
 interface AnalysisResult {
   id: string;
@@ -59,7 +62,7 @@ export default function SharePage() {
           setResult(analysisResult);
         } else {
           console.log('❌ [웹 페이지] dataParam이 없습니다');
-          throw new Error('공유 데이터를 찾을 수 없습니다.');
+          setError('공유 데이터를 찾을 수 없습니다.');
         }
       } catch (err) {
         console.error('❌ [웹 페이지] 오류:', err);
@@ -69,7 +72,13 @@ export default function SharePage() {
       }
     };
 
-    loadResult();
+    // 클라이언트에서만 실행되도록 확인
+    if (typeof window !== 'undefined') {
+      loadResult();
+    } else {
+      setLoading(false);
+      setError('서버 사이드에서는 렌더링할 수 없습니다.');
+    }
   }, [searchParams]);
 
   if (loading) {
