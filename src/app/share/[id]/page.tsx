@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 interface AnalysisResult {
@@ -27,19 +27,43 @@ interface AnalysisResult {
 
 export default function SharePage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchResult = async () => {
+    const loadResult = async () => {
       try {
-        const response = await fetch(`/api/share/${params.id}`);
-        if (!response.ok) {
-          throw new Error('결과를 찾을 수 없습니다.');
+        // URL 파라미터에서 데이터 확인
+        const dataParam = searchParams.get('data');
+        
+        if (dataParam) {
+          // URL 파라미터에서 데이터 디코딩
+          const decodedData = decodeURIComponent(dataParam);
+          const resultData = JSON.parse(decodedData);
+          
+          // AnalysisResult 형태로 변환
+          const analysisResult: AnalysisResult = {
+            id: 'shared',
+            originalImage: '', // 이미지는 URL 파라미터에 포함하지 않음
+            analysisResult: resultData,
+            createdAt: new Date().toISOString(),
+            language: resultData.language || 'ko',
+          };
+          
+          setResult(analysisResult);
+        } else if (params.id) {
+          // 기존 방식: 서버에서 데이터 조회
+          const response = await fetch(`/api/share/${params.id}`);
+          if (!response.ok) {
+            throw new Error('결과를 찾을 수 없습니다.');
+          }
+          const data = await response.json();
+          setResult(data);
+        } else {
+          throw new Error('공유 데이터를 찾을 수 없습니다.');
         }
-        const data = await response.json();
-        setResult(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.');
       } finally {
@@ -47,10 +71,8 @@ export default function SharePage() {
       }
     };
 
-    if (params.id) {
-      fetchResult();
-    }
-  }, [params.id]);
+    loadResult();
+  }, [params.id, searchParams]);
 
   if (loading) {
     return (
@@ -121,12 +143,19 @@ export default function SharePage() {
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
             <div className="p-6">
               <h2 className="text-xl font-bold text-gray-800 mb-4">원본 사진</h2>
-              <div className="aspect-square bg-gray-100 rounded-xl overflow-hidden">
-                <img 
-                  src={result.originalImage} 
-                  alt="원본 사진"
-                  className="w-full h-full object-cover"
-                />
+              <div className="aspect-square bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center">
+                {result.originalImage ? (
+                  <img 
+                    src={result.originalImage} 
+                    alt="원본 사진"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="text-center text-gray-500">
+                    <div className="text-6xl mb-4">📸</div>
+                    <p>원본 사진은 앱에서 확인하세요</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
