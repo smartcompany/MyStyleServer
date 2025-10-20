@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 interface AnalysisResult {
@@ -26,7 +26,6 @@ interface AnalysisResult {
 }
 
 export default function SharePage() {
-  const params = useParams();
   const searchParams = useSearchParams();
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -37,11 +36,15 @@ export default function SharePage() {
       try {
         // URL 파라미터에서 데이터 확인
         const dataParam = searchParams.get('data');
+        console.log('🔍 [웹 페이지] dataParam:', dataParam);
         
         if (dataParam) {
           // URL 파라미터에서 데이터 디코딩
           const decodedData = decodeURIComponent(dataParam);
+          console.log('🔍 [웹 페이지] decodedData:', decodedData);
+          
           const resultData = JSON.parse(decodedData);
+          console.log('🔍 [웹 페이지] resultData:', resultData);
           
           // AnalysisResult 형태로 변환
           const analysisResult: AnalysisResult = {
@@ -52,19 +55,14 @@ export default function SharePage() {
             language: resultData.language || 'ko',
           };
           
+          console.log('🔍 [웹 페이지] analysisResult:', analysisResult);
           setResult(analysisResult);
-        } else if (params.id) {
-          // 기존 방식: 서버에서 데이터 조회
-          const response = await fetch(`/api/share/${params.id}`);
-          if (!response.ok) {
-            throw new Error('결과를 찾을 수 없습니다.');
-          }
-          const data = await response.json();
-          setResult(data);
         } else {
+          console.log('❌ [웹 페이지] dataParam이 없습니다');
           throw new Error('공유 데이터를 찾을 수 없습니다.');
         }
       } catch (err) {
+        console.error('❌ [웹 페이지] 오류:', err);
         setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.');
       } finally {
         setLoading(false);
@@ -72,7 +70,7 @@ export default function SharePage() {
     };
 
     loadResult();
-  }, [params.id, searchParams]);
+  }, [searchParams]);
 
   if (loading) {
     return (
