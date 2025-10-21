@@ -51,8 +51,8 @@ function SharePageContent() {
         
         // 2. Next.js searchParams (GET 파라미터)
         console.log('🔍 [GET] searchParams 전체:', Object.fromEntries(searchParams.entries()));
-        let dataParam = searchParams.get('data');
-        let compressed = searchParams.get('compressed') === 'true';
+        const dataParam = searchParams.get('data');
+        const compressed = searchParams.get('compressed') === 'true';
         console.log('🔍 [GET] data 파라미터 길이:', dataParam?.length);
         console.log('🔍 [GET] compressed 파라미터:', compressed);
         
@@ -68,7 +68,7 @@ function SharePageContent() {
         // 4. POST 요청 확인 (body 데이터)
         if (typeof window !== 'undefined') {
           // POST 데이터는 일반적으로 페이지 로드 시에는 접근할 수 없지만 확인
-          console.log('🔍 [POST] window.postData:', (window as any).postData);
+          console.log('🔍 [POST] window.postData:', (window as unknown as { postData?: unknown }).postData);
           console.log('🔍 [POST] document.body:', document.body?.innerHTML?.substring(0, 100));
         }
         
