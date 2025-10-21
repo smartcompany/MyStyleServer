@@ -37,9 +37,24 @@ function SharePageContent() {
   useEffect(() => {
     const loadResult = async () => {
       try {
-        // URL 파라미터에서 데이터 확인
-        const dataParam = searchParams.get('data');
-        const compressed = searchParams.get('compressed') === 'true';
+        // 1. URL 파라미터에서 확인 (일반 웹 링크)
+        let dataParam = searchParams.get('data');
+        let compressed = searchParams.get('compressed') === 'true';
+        
+        // 2. 카카오톡 executionParams에서 확인 (카카오톡 공유)
+        if (!dataParam && typeof window !== 'undefined') {
+          const params = new URLSearchParams(window.location.search);
+          // 카카오톡 앱에서 전달된 파라미터 확인
+          const kakaoData = params.get('data');
+          const kakaoCompressed = params.get('compressed') === 'true';
+          
+          if (kakaoData) {
+            console.log('🔍 [웹 페이지] 카카오톡 executionParams에서 데이터 발견');
+            dataParam = kakaoData;
+            compressed = kakaoCompressed;
+          }
+        }
+        
         console.log('🔍 [웹 페이지] dataParam 길이:', dataParam?.length);
         console.log('🔍 [웹 페이지] compressed:', compressed);
         
