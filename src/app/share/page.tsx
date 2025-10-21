@@ -6,12 +6,7 @@ import { useEffect, useState, Suspense } from 'react';
 // 동적 렌더링 강제 (prerendering 비활성화)
 export const dynamic = 'force-dynamic';
 
-// 서버 사이드에서 요청 정보 확인
-export async function generateMetadata({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
-  const params = await searchParams;
-  console.log('🔍 [서버] generateMetadata searchParams:', params);
-  return {};
-}
+// generateMetadata는 서버 컴포넌트에서만 사용 가능하므로 제거
 
 interface AnalysisResult {
   id: string;
