@@ -37,26 +37,54 @@ function SharePageContent() {
   useEffect(() => {
     const loadResult = async () => {
       try {
+        console.log('========== 카카오톡 공유 디버깅 시작 ==========');
+        
+        // 전체 URL 정보 출력
+        if (typeof window !== 'undefined') {
+          console.log('🔍 [URL] 전체 URL:', window.location.href);
+          console.log('🔍 [URL] pathname:', window.location.pathname);
+          console.log('🔍 [URL] search:', window.location.search);
+          console.log('🔍 [URL] hash:', window.location.hash);
+        }
+        
         // 1. URL 파라미터에서 확인 (일반 웹 링크)
         let dataParam = searchParams.get('data');
         let compressed = searchParams.get('compressed') === 'true';
+        console.log('🔍 [파라미터 1] searchParams.get("data") 길이:', dataParam?.length);
+        console.log('🔍 [파라미터 1] searchParams.get("compressed"):', compressed);
         
-        // 2. 카카오톡 executionParams에서 확인 (카카오톡 공유)
-        if (!dataParam && typeof window !== 'undefined') {
+        // 2. window.location.search에서 직접 확인
+        if (typeof window !== 'undefined') {
           const params = new URLSearchParams(window.location.search);
-          // 카카오톡 앱에서 전달된 파라미터 확인
+          console.log('🔍 [파라미터 2] 전체 파라미터 목록:');
+          params.forEach((value, key) => {
+            console.log(`  - ${key}: ${value.substring(0, 100)}... (길이: ${value.length})`);
+          });
+          
           const kakaoData = params.get('data');
           const kakaoCompressed = params.get('compressed') === 'true';
           
-          if (kakaoData) {
-            console.log('🔍 [웹 페이지] 카카오톡 executionParams에서 데이터 발견');
+          if (kakaoData && !dataParam) {
+            console.log('✅ [파라미터 2] window.location.search에서 데이터 발견!');
             dataParam = kakaoData;
             compressed = kakaoCompressed;
           }
         }
         
-        console.log('🔍 [웹 페이지] dataParam 길이:', dataParam?.length);
-        console.log('🔍 [웹 페이지] compressed:', compressed);
+        // 3. POST 요청 확인 (body 데이터)
+        if (typeof window !== 'undefined' && (window as any).postData) {
+          console.log('🔍 [POST] POST 데이터 발견:', (window as any).postData);
+        }
+        
+        // 4. 카카오톡 SDK 글로벌 객체 확인
+        if (typeof window !== 'undefined') {
+          console.log('🔍 [Kakao] Kakao 객체:', (window as any).Kakao);
+          console.log('🔍 [Kakao] 기타 글로벌 변수들:', Object.keys(window).filter(k => k.toLowerCase().includes('kakao')));
+        }
+        
+        console.log('🔍 [최종] dataParam 길이:', dataParam?.length);
+        console.log('🔍 [최종] compressed:', compressed);
+        console.log('========================================');
         
         if (dataParam) {
           let resultData;
@@ -136,11 +164,25 @@ function SharePageContent() {
 
   if (error || !result) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4">
+        <div className="text-center max-w-2xl">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h1 className="text-2xl font-bold text-gray-800 mb-2">결과를 찾을 수 없습니다</h1>
-          <p className="text-gray-600">{error}</p>
+          <p className="text-gray-600 mb-4">{error}</p>
+          
+          {/* 디버깅 정보 */}
+          <div className="bg-white rounded-lg shadow-md p-4 text-left mt-6">
+            <h2 className="text-lg font-semibold mb-2">🔍 디버깅 정보</h2>
+            <div className="text-sm text-gray-700 space-y-1">
+              <p><strong>현재 URL:</strong> {typeof window !== 'undefined' ? window.location.href : 'N/A'}</p>
+              <p><strong>URL 파라미터:</strong> {typeof window !== 'undefined' ? window.location.search || '없음' : 'N/A'}</p>
+              <p><strong>data 파라미터:</strong> {searchParams.get('data') ? `있음 (길이: ${searchParams.get('data')?.length})` : '없음'}</p>
+              <p><strong>compressed 파라미터:</strong> {searchParams.get('compressed') || '없음'}</p>
+            </div>
+            <div className="mt-4 text-xs text-gray-500">
+              <p>💡 개발자 도구 (F12) → Console 탭에서 더 자세한 로그를 확인하세요.</p>
+            </div>
+          </div>
         </div>
       </div>
     );
