@@ -3,8 +3,10 @@ import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
 import faceAnalysisPrompt from './face_analysis_prompt.txt';
 import fullBodyAnalysisPrompt from './fullbody_analysis_prompt.txt';
+import fullBodyAnalysisDescriptivePrompt from './fullbody_analysis_descriptive_prompt.txt';
 import dummyAnalysis from './dummy-analysis.json';
 import dummyAnalysisBody from './dummy-analysis-body.json';
+import dummyAnalysisBodyDescriptive from './dummy-analysis-body-descriptive.json';
 import { getLanguageFromHeaders, getLanguageSpecificPrompt, openAIConfig } from '../_helpers';
 
 const openai = new OpenAI({
@@ -29,8 +31,10 @@ export async function POST(request: NextRequest) {
     const analysisType = formData.get('type') as string || 'face'; // 기본값은 얼굴 분석
     const useDummy = formData.get('useDummy') as string || 'false';
     const weatherData = formData.get('weather') as string;
+    const descriptiveMode = formData.get('descriptiveMode') as string || 'false'; // 서술형 모드 파라미터 추가
     
     console.log('분석 타입:', analysisType);
+    console.log('서술형 모드:', descriptiveMode);
     
     // 날씨 정보 파싱
     let weather = null;
@@ -46,7 +50,12 @@ export async function POST(request: NextRequest) {
     if (useDummy === 'true') {
       console.log('더미 분석 사용');
       if (analysisType === 'fullbody') {
-        return NextResponse.json(dummyAnalysisBody);
+        // 서술형 모드에 따라 다른 더미 데이터 사용
+        if (descriptiveMode === 'true') {
+          return NextResponse.json(dummyAnalysisBodyDescriptive);
+        } else {
+          return NextResponse.json(dummyAnalysisBody);
+        }
       } else {
         return NextResponse.json(dummyAnalysis);
       }
@@ -105,8 +114,12 @@ export async function POST(request: NextRequest) {
     let systemMessage;
     
     if (analysisType === 'fullbody') {
-      // 전신 분석
-      prompt = getLanguageSpecificPrompt(fullBodyAnalysisPrompt, language);
+      // 전신 분석 - 서술형 모드에 따라 다른 프롬프트 사용
+      if (descriptiveMode === 'true') {
+        prompt = getLanguageSpecificPrompt(fullBodyAnalysisDescriptivePrompt, language);
+      } else {
+        prompt = getLanguageSpecificPrompt(fullBodyAnalysisPrompt, language);
+      }
       
       // 날씨 정보가 있으면 템플릿 변수를 실제 값으로 치환
       if (weather) {
