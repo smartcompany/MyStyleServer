@@ -6,6 +6,13 @@ import { useEffect, useState, Suspense } from 'react';
 // 동적 렌더링 강제 (prerendering 비활성화)
 export const dynamic = 'force-dynamic';
 
+// 서버 사이드에서 요청 정보 확인
+export async function generateMetadata({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
+  const params = await searchParams;
+  console.log('🔍 [서버] generateMetadata searchParams:', params);
+  return {};
+}
+
 interface AnalysisResult {
   id: string;
   originalImage: string;
@@ -37,9 +44,9 @@ function SharePageContent() {
   useEffect(() => {
     const loadResult = async () => {
       try {
-        console.log('========== 카카오톡 공유 디버깅 시작 ==========');
+        console.log('========== 페이지 로드 시 요청 정보 확인 ==========');
         
-        // 전체 URL 정보 출력
+        // 1. 전체 URL 정보
         if (typeof window !== 'undefined') {
           console.log('🔍 [URL] 전체 URL:', window.location.href);
           console.log('🔍 [URL] pathname:', window.location.pathname);
@@ -47,44 +54,51 @@ function SharePageContent() {
           console.log('🔍 [URL] hash:', window.location.hash);
         }
         
-        // 1. URL 파라미터에서 확인 (일반 웹 링크)
+        // 2. Next.js searchParams (GET 파라미터)
+        console.log('🔍 [GET] searchParams 전체:', Object.fromEntries(searchParams.entries()));
         let dataParam = searchParams.get('data');
         let compressed = searchParams.get('compressed') === 'true';
-        console.log('🔍 [파라미터 1] searchParams.get("data") 길이:', dataParam?.length);
-        console.log('🔍 [파라미터 1] searchParams.get("compressed"):', compressed);
+        console.log('🔍 [GET] data 파라미터 길이:', dataParam?.length);
+        console.log('🔍 [GET] compressed 파라미터:', compressed);
         
-        // 2. window.location.search에서 직접 확인
+        // 3. window.location.search 직접 확인
         if (typeof window !== 'undefined') {
-          const params = new URLSearchParams(window.location.search);
-          console.log('🔍 [파라미터 2] 전체 파라미터 목록:');
-          params.forEach((value, key) => {
-            console.log(`  - ${key}: ${value.substring(0, 100)}... (길이: ${value.length})`);
+          const urlParams = new URLSearchParams(window.location.search);
+          console.log('🔍 [URL] window.location.search 파라미터들:');
+          urlParams.forEach((value, key) => {
+            console.log(`  - ${key}: ${value.substring(0, 50)}... (길이: ${value.length})`);
           });
-          
-          const kakaoData = params.get('data');
-          const kakaoCompressed = params.get('compressed') === 'true';
-          
-          if (kakaoData && !dataParam) {
-            console.log('✅ [파라미터 2] window.location.search에서 데이터 발견!');
-            dataParam = kakaoData;
-            compressed = kakaoCompressed;
-          }
         }
         
-        // 3. POST 요청 확인 (body 데이터)
-        if (typeof window !== 'undefined' && (window as any).postData) {
-          console.log('🔍 [POST] POST 데이터 발견:', (window as any).postData);
-        }
-        
-        // 4. 카카오톡 SDK 글로벌 객체 확인
+        // 4. POST 요청 확인 (body 데이터)
         if (typeof window !== 'undefined') {
-          console.log('🔍 [Kakao] Kakao 객체:', (window as any).Kakao);
-          console.log('🔍 [Kakao] 기타 글로벌 변수들:', Object.keys(window).filter(k => k.toLowerCase().includes('kakao')));
+          // POST 데이터는 일반적으로 페이지 로드 시에는 접근할 수 없지만 확인
+          console.log('🔍 [POST] window.postData:', (window as any).postData);
+          console.log('🔍 [POST] document.body:', document.body?.innerHTML?.substring(0, 100));
         }
         
-        console.log('🔍 [최종] dataParam 길이:', dataParam?.length);
-        console.log('🔍 [최종] compressed:', compressed);
+        // 5. HTTP 헤더 정보 (가능한 범위에서)
+        if (typeof window !== 'undefined') {
+          console.log('🔍 [HEADER] navigator.userAgent:', navigator.userAgent);
+          console.log('🔍 [HEADER] document.referrer:', document.referrer);
+        }
+        
         console.log('========================================');
+        
+        // 6. 서버 사이드 API로 요청 정보 확인
+        try {
+          console.log('🔍 [API] 서버 사이드 요청 정보 확인 중...');
+          const debugResponse = await fetch('/api/debug?' + window.location.search, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+          const debugData = await debugResponse.json();
+          console.log('🔍 [API] 서버 응답:', debugData);
+        } catch (e) {
+          console.log('🔍 [API] 디버그 API 호출 실패:', e);
+        }
         
         if (dataParam) {
           let resultData;
@@ -164,25 +178,11 @@ function SharePageContent() {
 
   if (error || !result) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4">
-        <div className="text-center max-w-2xl">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
+        <div className="text-center">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h1 className="text-2xl font-bold text-gray-800 mb-2">결과를 찾을 수 없습니다</h1>
-          <p className="text-gray-600 mb-4">{error}</p>
-          
-          {/* 디버깅 정보 */}
-          <div className="bg-white rounded-lg shadow-md p-4 text-left mt-6">
-            <h2 className="text-lg font-semibold mb-2">🔍 디버깅 정보</h2>
-            <div className="text-sm text-gray-700 space-y-1">
-              <p><strong>현재 URL:</strong> {typeof window !== 'undefined' ? window.location.href : 'N/A'}</p>
-              <p><strong>URL 파라미터:</strong> {typeof window !== 'undefined' ? window.location.search || '없음' : 'N/A'}</p>
-              <p><strong>data 파라미터:</strong> {searchParams.get('data') ? `있음 (길이: ${searchParams.get('data')?.length})` : '없음'}</p>
-              <p><strong>compressed 파라미터:</strong> {searchParams.get('compressed') || '없음'}</p>
-            </div>
-            <div className="mt-4 text-xs text-gray-500">
-              <p>💡 개발자 도구 (F12) → Console 탭에서 더 자세한 로그를 확인하세요.</p>
-            </div>
-          </div>
+          <p className="text-gray-600">{error}</p>
         </div>
       </div>
     );
