@@ -39,14 +39,41 @@ function SharePageContent() {
       try {
         // URL 파라미터에서 데이터 확인
         const dataParam = searchParams.get('data');
-        console.log('🔍 [웹 페이지] dataParam:', dataParam);
+        const compressed = searchParams.get('compressed') === 'true';
+        console.log('🔍 [웹 페이지] dataParam 길이:', dataParam?.length);
+        console.log('🔍 [웹 페이지] compressed:', compressed);
         
         if (dataParam) {
-          // URL 파라미터에서 데이터 디코딩
-          const decodedData = decodeURIComponent(dataParam);
-          console.log('🔍 [웹 페이지] decodedData:', decodedData);
+          let resultData;
           
-          const resultData = JSON.parse(decodedData);
+          if (compressed) {
+            // 압축된 데이터 처리
+            console.log('🔍 [웹 페이지] 압축된 데이터 해제 시작');
+            
+            // URL 디코딩
+            const urlDecoded = decodeURIComponent(dataParam);
+            console.log('🔍 [웹 페이지] URL 디코딩 완료');
+            
+            // Base64 디코딩
+            const binaryString = atob(urlDecoded);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+              bytes[i] = binaryString.charCodeAt(i);
+            }
+            console.log('🔍 [웹 페이지] Base64 디코딩 완료:', bytes.length, 'bytes');
+            
+            // Pako로 GZIP 해제
+            const pako = await import('pako');
+            const decompressed = pako.ungzip(bytes, { to: 'string' });
+            console.log('🔍 [웹 페이지] GZIP 해제 완료:', decompressed.length, 'bytes');
+            
+            resultData = JSON.parse(decompressed);
+          } else {
+            // 압축되지 않은 데이터 처리 (기존 방식)
+            const decodedData = decodeURIComponent(dataParam);
+            resultData = JSON.parse(decodedData);
+          }
+          
           console.log('🔍 [웹 페이지] resultData:', resultData);
           
           // AnalysisResult 형태로 변환
