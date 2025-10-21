@@ -1,10 +1,57 @@
-'use client';
-
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
+import { NextRequest } from 'next/server';
 
 // 동적 렌더링 강제 (prerendering 비활성화)
 export const dynamic = 'force-dynamic';
+
+// 서버 사이드에서 직접 POST 데이터 확인
+export async function POST(request: NextRequest) {
+  console.log('========== /share 페이지 직접 POST 요청 확인 ==========');
+  
+  // URL 정보
+  console.log('🔍 [직접] URL:', request.url);
+  console.log('🔍 [직접] pathname:', request.nextUrl.pathname);
+  
+  // 헤더 정보
+  console.log('🔍 [직접] Content-Type:', request.headers.get('content-type'));
+  console.log('🔍 [직접] User-Agent:', request.headers.get('user-agent'));
+  console.log('🔍 [직접] Referer:', request.headers.get('referer'));
+  
+  // Body 데이터
+  try {
+    const body = await request.text();
+    console.log('🔍 [직접] Body 길이:', body.length);
+    console.log('🔍 [직접] Body 내용 (처음 500자):', body.substring(0, 500));
+    
+    // JSON 파싱 시도
+    try {
+      const jsonData = JSON.parse(body);
+      console.log('🔍 [직접] JSON 데이터:', jsonData);
+      
+      // 카카오톡 데이터가 있는지 확인
+      if (jsonData.data || jsonData.kakaoData) {
+        console.log('✅ [직접] 카카오톡 데이터 발견!');
+        return Response.json({
+          message: '카카오톡 POST 데이터 수신 완료',
+          data: jsonData,
+        });
+      }
+    } catch (e) {
+      console.log('🔍 [직접] JSON 파싱 실패:', e);
+    }
+  } catch (e) {
+    console.log('🔍 [직접] Body 읽기 실패:', e);
+  }
+  
+  console.log('========================================');
+  
+  return Response.json({
+    message: 'POST 요청 정보 확인 완료',
+    url: request.url,
+    headers: Object.fromEntries(request.headers.entries()),
+  });
+}
 
 // generateMetadata는 서버 컴포넌트에서만 사용 가능하므로 제거
 
@@ -65,11 +112,33 @@ function SharePageContent() {
           });
         }
         
-        // 4. POST 요청 확인 (body 데이터)
+        // 4. POST 요청 확인 (body 데이터) - 직접 확인
         if (typeof window !== 'undefined') {
-          // POST 데이터는 일반적으로 페이지 로드 시에는 접근할 수 없지만 확인
-          console.log('🔍 [POST] window.postData:', (window as unknown as { postData?: unknown }).postData);
-          console.log('🔍 [POST] document.body:', document.body?.innerHTML?.substring(0, 100));
+          console.log('🔍 [직접] window 객체에서 POST 데이터 확인:');
+          console.log('🔍 [직접] window.postData:', (window as unknown as { postData?: unknown }).postData);
+          console.log('🔍 [직접] window.kakaoData:', (window as unknown as { kakaoData?: unknown }).kakaoData);
+          console.log('🔍 [직접] window.location.href:', window.location.href);
+          
+          // document에서 숨겨진 데이터 확인
+          const hiddenInputs = document.querySelectorAll('input[type="hidden"]');
+          console.log('🔍 [직접] 숨겨진 input 필드들:', hiddenInputs.length);
+          hiddenInputs.forEach((input, index) => {
+            console.log(`  - input[${index}]: ${(input as HTMLInputElement).name} = ${(input as HTMLInputElement).value}`);
+          });
+          
+          // meta 태그에서 데이터 확인
+          const metaTags = document.querySelectorAll('meta[name*="kakao"], meta[name*="data"]');
+          console.log('🔍 [직접] 관련 meta 태그들:', metaTags.length);
+          metaTags.forEach((meta, index) => {
+            console.log(`  - meta[${index}]: ${meta.getAttribute('name')} = ${meta.getAttribute('content')}`);
+          });
+          
+          // localStorage/sessionStorage 확인
+          console.log('🔍 [직접] localStorage:', Object.keys(localStorage));
+          console.log('🔍 [직접] sessionStorage:', Object.keys(sessionStorage));
+          
+          // document.body에서 데이터 확인
+          console.log('🔍 [직접] document.body:', document.body?.innerHTML?.substring(0, 200));
         }
         
         // 5. HTTP 헤더 정보 (가능한 범위에서)
@@ -80,20 +149,8 @@ function SharePageContent() {
         
         console.log('========================================');
         
-        // 6. 서버 사이드 API로 요청 정보 확인
-        try {
-          console.log('🔍 [API] 서버 사이드 요청 정보 확인 중...');
-          const debugResponse = await fetch('/api/debug?' + window.location.search, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
-          const debugData = await debugResponse.json();
-          console.log('🔍 [API] 서버 응답:', debugData);
-        } catch (e) {
-          console.log('🔍 [API] 디버그 API 호출 실패:', e);
-        }
+        // 6. 추가 확인: 모든 가능한 데이터 소스
+        console.log('🔍 [추가] 모든 가능한 데이터 소스 확인 완료');
         
         if (dataParam) {
           let resultData;
