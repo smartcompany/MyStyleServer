@@ -12,6 +12,93 @@ export async function GET(request: NextRequest) {
   console.log('🔍 [GET] User-Agent:', request.headers.get('user-agent'));
   console.log('🔍 [GET] Referer:', request.headers.get('referer'));
   
+  // URL 파라미터에서 데이터 확인
+  const dataParam = request.nextUrl.searchParams.get('data');
+  const compressed = request.nextUrl.searchParams.get('compressed') === 'true';
+  
+  if (dataParam) {
+    console.log('🔍 [GET] URL 파라미터에서 데이터 발견!');
+    console.log('🔍 [GET] data 파라미터 길이:', dataParam.length);
+    console.log('🔍 [GET] compressed:', compressed);
+    
+    try {
+      let resultData;
+      
+      if (compressed) {
+        // 압축된 데이터 처리
+        console.log('🔍 [GET] 압축된 데이터 해제 시작');
+        
+        // URL 디코딩
+        const urlDecoded = decodeURIComponent(dataParam);
+        console.log('🔍 [GET] URL 디코딩 완료');
+        
+        // Base64 디코딩
+        const binaryString = atob(urlDecoded);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        console.log('🔍 [GET] Base64 디코딩 완료:', bytes.length, 'bytes');
+        
+        // Pako로 GZIP 해제
+        const pako = await import('pako');
+        const decompressed = pako.ungzip(bytes, { to: 'string' });
+        console.log('🔍 [GET] GZIP 해제 완료:', decompressed.length, 'bytes');
+        
+        resultData = JSON.parse(decompressed);
+      } else {
+        // 압축되지 않은 데이터 처리
+        const decodedData = decodeURIComponent(dataParam);
+        resultData = JSON.parse(decodedData);
+      }
+      
+      console.log('✅ [GET] 데이터 파싱 성공:', resultData);
+      
+      // 성공 페이지 표시
+      const successHtml = `
+        <!DOCTYPE html>
+        <html lang="ko">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>AI 스타일 분석 결과</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+            .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 10px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+            .success { color: #27ae60; text-align: center; }
+            .debug { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 15px; margin: 20px 0; }
+            .debug h3 { margin-top: 0; color: #495057; }
+            .debug pre { background: #e9ecef; padding: 10px; border-radius: 3px; overflow-x: auto; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>✅ AI 스타일 분석 결과</h1>
+            <div class="success">
+              <h2>🎉 데이터를 성공적으로 불러왔습니다!</h2>
+              <p>카카오톡에서 URL 파라미터로 데이터를 전달했습니다.</p>
+            </div>
+            
+            <div class="debug">
+              <h3>📊 파싱된 데이터</h3>
+              <pre>${JSON.stringify(resultData, null, 2)}</pre>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+      
+      return new NextResponse(successHtml, {
+        headers: {
+          'Content-Type': 'text/html',
+        },
+      });
+      
+    } catch (e) {
+      console.log('❌ [GET] 데이터 파싱 실패:', e);
+    }
+  }
+  
   // HTML 응답
   const html = `
     <!DOCTYPE html>
