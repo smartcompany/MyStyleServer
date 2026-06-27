@@ -111,7 +111,8 @@ export class AIStylingService {
 
         console.log('이미지 편집 응답:', completion);
 
-       const url = completion.data?.[0]?.url ?? null;
+       const rawUrl = completion.data?.[0]?.url;
+       const url = typeof rawUrl === "string" ? rawUrl : null;
        if (!url) {
          throw new Error("no image url from API");
        }
