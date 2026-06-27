@@ -1,5 +1,5 @@
-import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
+import { ai } from './ai-client';
 
 // 타입 정의
 interface WeatherData {
@@ -21,11 +21,6 @@ interface StylingResponse {
 const storageBucket = process.env.STORAGE_BUCKET; 
 const PROMPTS_FOLDER = 'prompts';
 const USER_PHOTOS_FOLDER = 'user-photos';
-
-// OpenAI 클라이언트 초기화
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || '',
-});
 
 // Supabase 클라이언트 초기화 (환경 변수 체크)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -109,8 +104,7 @@ export class AIStylingService {
       const populatedUserPrompt = this.populatePromptTemplate(userPrompt, request);
 
         console.log('이미지 편집 시작...');
-        const completion = await openai.images.edit({
-          model: "gpt-image-1",
+        const completion = await ai.editImage({
           image: new File([image], 'image.jpg', { type: 'image/jpeg' }),
           prompt: populatedUserPrompt,
         });

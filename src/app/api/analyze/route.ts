@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
 import faceAnalysisPrompt from './face_analysis_prompt.txt';
 import fullBodyAnalysisPrompt from './fullbody_analysis_prompt.txt';
@@ -7,11 +6,8 @@ import fullBodyAnalysisDescriptivePrompt from './fullbody_analysis_descriptive_p
 import dummyAnalysis from './dummy-analysis.json';
 import dummyAnalysisBody from './dummy-analysis-body.json';
 import dummyAnalysisBodyDescriptive from './dummy-analysis-body-descriptive.json';
-import { getLanguageFromHeaders, getLanguageSpecificPrompt, openAIConfig } from '../_helpers';
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import { getLanguageFromHeaders, getLanguageSpecificPrompt } from '../_helpers';
+import { ai } from '@/lib/ai-client';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -146,8 +142,7 @@ export async function POST(request: NextRequest) {
     // OpenAI Vision API 호출
     console.log('OpenAI API 호출 시작 (분석 타입:', analysisType, ')');
     
-    const response = await openai.chat.completions.create({
-      ...openAIConfig,
+    const response = await ai.createChatCompletion({
       messages: [
         {
           role: 'system',

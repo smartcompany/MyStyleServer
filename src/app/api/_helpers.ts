@@ -74,8 +74,3 @@ export function getLanguageSpecificMessage(key: string, language: string): strin
 
   return messages.success.ko; // 기본값
 }
-
-// OpenAI 공통 설정
-export const openAIConfig = {
-  model: "gpt-5-mini"
-};
